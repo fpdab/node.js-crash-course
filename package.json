@@ -1,0 +1,15 @@
+{
+  "name": "node-crash-course",
+  "version": "1.0.0",
+  "description": "https://www.youtube.com/watch?v=32M1al-Y6Ag&list=LL&index=2",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "nodemon --env-file=.env server2.js"
+  },
+  "author": "Filip Dabek",
+  "license": "no-license",
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
