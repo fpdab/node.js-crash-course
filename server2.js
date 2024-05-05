@@ -1,3 +1,4 @@
+import { error } from "console"
 import { createServer } from "http"
 const PORT = process.env.PORT
 
@@ -25,6 +26,24 @@ const getUsersHandler = (req, res) => {
   res.end()
 }
 
+//Route handler for POST /api/users
+const createUserHandler = (req, res) => {
+  let body = ""
+  //Listen for data, convert binary stream chunks into strings
+  req.on("data", (chunk) => {
+    body += chunk.toString()
+  })
+  //Convert finished stream into json type object
+  req.on("end", () => {
+    const newUser = JSON.parse(body)
+    users.push(newUser)
+    res.statusCode = 201
+    res.write(JSON.stringify(newUser))
+    res.end()
+    console.log(users)
+  })
+}
+
 //Route handler for GET /api/users/:id
 const getUserHandler = (req, res) => {
   const id = parseInt(req.url.split("/")[3])
@@ -47,6 +66,12 @@ const notFoundHandler = (req, res) => {
 const server = createServer((req, res) => {
   logger(req, res, () => {
     jsonMiddleware(req, res, () => {
+      req.on("error", (err) => {
+        console.error(err)
+      })
+      res.on("error", (err) => {
+        console.error(err)
+      })
       if (req.method === "GET" && req.url == `/api/users`) {
         getUsersHandler(req, res)
       } else if (
@@ -54,6 +79,8 @@ const server = createServer((req, res) => {
         req.url.match(/\/api\/users\/[1-9]+/)
       ) {
         getUserHandler(req, res)
+      } else if (req.method === "POST" && req.url == `/api/users`) {
+        createUserHandler(req, res)
       } else {
         notFoundHandler(req, res)
       }
