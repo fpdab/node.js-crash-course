@@ -1,12 +1,18 @@
 import { error } from "console"
+import fs  from "fs/promises"
 import { createServer } from "http"
 const PORT = process.env.PORT
 
-const users = [
-  { id: 1, name: "John Doe" },
-  { id: 2, name: "Joe Doe" },
-  { id: 3, name: "Jane Doe" },
-]
+// Read users.txt at start
+const readUsersFile = async () => {
+  try {
+    const data = await fs.readFile('./users.txt', 'utf-8')
+    return JSON.parse(data)
+  } catch (error) {
+    console.log(error)
+  }
+}
+const users = await readUsersFile()
 
 // Logger middleware
 const logger = (req, res, next) => {
@@ -26,6 +32,15 @@ const getUsersHandler = (req, res) => {
   res.end()
 }
 
+//Write actual users array to users.txt
+const writeToUsersFile = async (users) => {
+  try {
+    await fs.writeFile('./users.txt', JSON.stringify(users))
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 //Route handler for POST /api/users
 const createUserHandler = (req, res) => {
   let body = ""
@@ -40,7 +55,7 @@ const createUserHandler = (req, res) => {
     res.statusCode = 201
     res.write(JSON.stringify(newUser))
     res.end()
-    console.log(users)
+    writeToUsersFile(users)
   })
 }
 
